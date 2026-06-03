@@ -1,0 +1,11 @@
+venv/
+data/
+models/
+outputs/
+
+kaggle.json
+
+__pycache__/
+*.pyc
+
+.vscode/
