@@ -1,126 +1,157 @@
-# Non-Contact Gender Estimation System
+# Non-Contact Gender and Age Identification Using Cameras
 
-Camera-based gender classification using MTCNN face detection + MobileNetV2 classifier.
+## Overview
+
+This project implements a real-time, non-contact gender and age identification system using computer vision and deep learning.
+
+The system captures live video from a webcam, detects faces using RetinaFace, and predicts both gender and age using a MobileNetV2-based multi-task deep learning model.
+
+The solution is designed to be lightweight, CPU-friendly, and suitable for real-time applications.
 
 ---
 
-## Project structure
+## Features
 
-```
-gender_estimation/
+* Real-time webcam inference
+* RetinaFace face detection
+* Face alignment using facial landmarks
+* Gender classification (Male / Female)
+* Age estimation
+* Temporal smoothing to reduce prediction flicker
+* CPU-optimized inference
+* MobileNetV2 transfer learning
+
+---
+
+## Project Pipeline
+
+Webcam Feed
+
+↓
+
+RetinaFace Face Detection
+
+↓
+
+Face Alignment
+
+↓
+
+Face Cropping & Preprocessing
+
+↓
+
+MobileNetV2 Multi-Task Network
+
+↓
+
+Gender Prediction + Age Estimation
+
+---
+
+## Dataset
+
+UTKFace Dataset
+
+Filename format:
+
+age_gender_race_timestamp.jpg
+
+Example:
+
+25_0_2_20170116174525125.jpg
+
+Where:
+
+* Age = 25
+* Gender = 0 (Male)
+* Race = 2
+
+---
+
+## Technologies Used
+
+* Python
+* OpenCV
+* TensorFlow / Keras
+* MobileNetV2
+* InsightFace (RetinaFace)
+* NumPy
+* Scikit-Learn
+
+---
+
+## Project Structure
+
+gender_detection/
+
 ├── data/
-│   ├── raw/
-│   │   └── UTKFace/          ← place dataset here
-│   └── processed/
+
 ├── models/
-│   ├── checkpoints/          ← saved during training
-│   └── saved/                ← final model (.h5)
-├── results/                  ← plots, metrics, saved frames
+
+├── outputs/
+
 ├── src/
-│   ├── config.py             ← all paths and hyperparameters
-│   ├── dataset.py            ← data loading, augmentation, splits
-│   ├── face_detector.py      ← MTCNN wrapper
-│   ├── model.py              ← MobileNetV2 classifier
-│   ├── train.py              ← training script
-│   ├── evaluate.py           ← test set metrics + fairness
-│   └── inference.py          ← live webcam demo
-└── requirements.txt
-```
+
+│ ├── prepare_dataset.py
+
+│ ├── train_gender_age_model.py
+
+│ ├── inference_gender_age.py
+
+│ ├── test_retinaface.py
+
+│ ├── test_mobilenet.py
+
+│ └── test_camera.py
+
+├── requirements.txt
+
+└── README.md
 
 ---
 
-## Setup
+## Current Status
 
-### 1. Create a virtual environment
+✅ Environment setup completed
 
-```bash
-python -m venv venv
-source venv/bin/activate        # Linux / macOS
-venv\Scripts\activate           # Windows
-```
+✅ Dataset preparation completed
 
-### 2. Install dependencies
+✅ RetinaFace integration completed
 
-```bash
-pip install -r requirements.txt
-```
+✅ MobileNetV2 architecture implemented
 
-### 3. Download the dataset
+✅ Gender + Age model training pipeline completed
 
-Download **UTKFace** from:
-https://susanqq.github.io/UTKFace/
+✅ Real-time webcam inference completed
 
-Extract and place at:
-```
-data/raw/UTKFace/
-```
-
-Files should look like:
-```
-data/raw/UTKFace/25_0_0_201701....jpg
-data/raw/UTKFace/32_1_2_201706....jpg
-```
+🚧 Performance optimization in progress
 
 ---
 
-## Run
+## Research Objectives
 
-### Train the model
-
-```bash
-cd gender_estimation
-python src/train.py
-```
-
-This runs two phases:
-- **Phase 1 (warm-up):** trains only the classification head for 10 epochs.
-- **Phase 2 (fine-tune):** unfreezes top backbone layers and trains for up to 30 epochs.
-
-Training curves are saved to `results/`.
-
-### Evaluate on test set
-
-```bash
-python src/evaluate.py --model models/saved/gender_model.h5
-```
-
-Outputs: confusion matrix, per-race fairness breakdown.
-
-### Real-time webcam inference
-
-```bash
-python src/inference.py --model models/saved/gender_model.h5 --camera 0
-```
-
-- `Q` → quit
-- `S` → save current frame
+* Non-contact gender identification
+* Real-time age estimation
+* Lightweight deployment on CPU systems
+* Robust performance under varying lighting conditions
+* Face alignment and preprocessing improvements
+* Real-time inference optimization
 
 ---
 
-## Key design choices
+## Future Improvements
 
-| Choice | Reason |
-|---|---|
-| MTCNN | Best balance of speed and accuracy for multi-face detection |
-| MobileNetV2 backbone | Lightweight, fast inference on CPU, high accuracy |
-| Two-phase training | Avoids catastrophic forgetting of ImageNet features |
-| UTKFace dataset | Age + gender + race labels → enables fairness analysis |
-| Stratified split | Preserves class balance across train/val/test |
-| Augmentation | Flip, brightness, crop, occlusion patch for robustness |
+* TensorFlow Lite deployment
+* Edge-device optimization
+* Model quantization
+* Fairness analysis across demographic groups
+* Multi-person tracking improvements
+* Web-based deployment using Flask or FastAPI
 
 ---
 
-## Expected performance (UTKFace)
+## Author
 
-| Metric | Typical result |
-|---|---|
-| Test accuracy | 92–95% |
-| ROC-AUC | 0.97–0.99 |
+Rithik Roshan V
 
----
-
-## Next steps
-
-- Export to TensorFlow Lite for mobile/edge deployment
-- Add age estimation as a secondary head (multi-task learning)
-- Integrate with a Raspberry Pi + Pi Camera for embedded deployment
